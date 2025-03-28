@@ -1,0 +1,46 @@
+name: spicedb-postgres
+
+services:
+  spicedb:
+    image: authzed/spicedb
+    command: serve
+    restart: always
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+      - "50051:50051"
+    environment:
+      - SPICEDB_GRPC_PRESHARED_KEY=${SPICEDB_GRPC_PSK}
+      - SPICEDB_DATASTORE_ENGINE=postgres
+      - SPICEDB_DATASTORE_CONN_URI=postgres://${PG_USER}:${PG_PASSWORD}@database:5432/${PG_DBNAME}?sslmode=disable
+      - SPICEDB_DATASTORE_BOOTSTRAP_FILES=/bootstrap/spicedb_schema.yaml,/bootstrap/spicedb_relations.yaml
+    volumes:
+      # Mount the local folder containing your YAML files into the container
+      - ./bootstrap:/bootstrap
+    depends_on:
+      - migrate
+
+  migrate:
+    image: authzed/spicedb
+    command: "migrate head"
+    restart: on-failure
+    environment:
+      - SPICEDB_DATASTORE_ENGINE=postgres
+      - SPICEDB_DATASTORE_CONN_URI=postgres://${PG_USER}:${PG_PASSWORD}@database:5432/${PG_DBNAME}?sslmode=disable
+    depends_on:
+      - database
+
+  database:
+    container_name: postgres
+    restart: always
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql
+    environment:
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DBNAME}
+        
+volumes:
+  pgdata:

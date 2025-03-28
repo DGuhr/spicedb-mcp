@@ -1,0 +1,68 @@
+relationships: |
+  project:smallproject#administrator@user:lead1
+
+  team:smallprojectteam#member@user:smallprojectmember1
+  team:smallprojectteam#member@user:smallprojectmember2
+  team:smallprojectteam#member@user:smallprojectmember3
+
+  folder:smallprojectroot#parent_project@project:smallproject
+  folder:smallprojectroot#reader@team:smallprojectteam#member
+
+  folder:smallprojectdocs#parent_project@project:smallproject
+  folder:smallprojectdocs#owner@user:smallprojectmember1
+  folder:smallprojectdocs#reader@team:smallprojectteam#member
+
+  document:smallprojectdoc1#owner@user:smallprojectmember1
+  document:smallprojectdoc1#parent_folder@folder:smallprojectdocs
+
+  document:smallprojectdoc2#owner@user:smallprojectmember2
+  document:smallprojectdoc2#parent_folder@folder:smallprojectdocs
+
+  document:smallprojectdoc3#owner@user:smallprojectmember3
+  document:smallprojectdoc3#parent_folder@folder:smallprojectdocs
+
+  // big project
+  project:bigproject#administrator@user:CTO
+
+  // Search team
+  team:searchteam#member@user:searchteamlead1
+  team:searchteam#member@user:searchteammember2
+  team:searchteam#member@user:searchteammember3
+  team:searchteam#member@user:searchteammember4
+
+  // payment team
+  team:paymentteam#member@user:paymentteamlead1
+  team:paymentteam#member@user:paymentteammember2
+  team:paymentteam#member@user:paymentteammember3
+  team:paymentteam#member@user:paymentteammember4
+
+  //folders
+  folder:bigprojectroot#parent_project@project:bigproject
+  folder:bigprojectroot#reader@team:searchteam#member
+  folder:bigprojectroot#reader@team:paymentteam#member
+
+  //search subfolder
+  folder:search#parent_project@project:bigproject
+  folder:search#owner@user:searchteamlead1
+  folder:search#reader@team:searchteam#member
+
+  //payment subfolder
+  folder:payment#parent_project@project:bigproject
+  folder:payment#owner@user:paymentteamlead1
+  folder:payment#reader@team:paymentteam#member
+
+  //docs
+  document:readme#owner@user:CTO
+  document:readme#parent_folder@folder:bigprojectroot
+
+  document:search1#owner@user:searchteamlead1
+  document:search1#parent_folder@folder:search
+
+  document:search2#owner@user:searchteammember4
+  document:search2#parent_folder@folder:search
+
+  document:pay1#owner@user:paymentteamlead1
+  document:pay1#parent_folder@folder:payment
+
+  document:pay2#owner@user:paymentteammember3
+  document:pay2#parent_folder@folder:payment

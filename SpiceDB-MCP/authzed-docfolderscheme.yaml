@@ -1,0 +1,145 @@
+schema: |-
+  definition user {}
+
+  definition team {
+    relation member: user
+  }
+  definition project {
+    relation administrator: user
+    relation team : team
+    permission contribute = team + administrator
+    permission admin = administrator 
+  }
+
+  definition folder {
+      relation owner : user | team#member
+      relation parent_project: project
+      relation reader: user | team#member
+      permission read = reader + parent_project.any(admin)
+      permission admin = owner + parent_project.any(admin)
+  }
+
+  definition document {
+    relation owner : user
+    relation parent_folder: folder
+    
+    /** reader indicates that the user is a reader on the document */
+    relation reader: user | team#member
+
+    /** writer indicates that the user is a writer on the document */
+    relation writer: user | team#member
+
+    /** view indicates whether the user can view the document */
+    permission view = reader + writer + parent_folder.any(read)
+    permission admin = owner + parent_folder->admin
+  }
+relationships: |
+  project:smallproject#administrator@user:lead1
+
+  team:smallprojectteam#member@user:smallprojectmember1
+  team:smallprojectteam#member@user:smallprojectmember2
+  team:smallprojectteam#member@user:smallprojectmember3
+
+  folder:smallprojectroot#parent_project@project:smallproject
+  folder:smallprojectroot#reader@team:smallprojectteam#member
+
+  folder:smallprojectdocs#parent_project@project:smallproject
+  folder:smallprojectdocs#owner@user:smallprojectmember1
+  folder:smallprojectdocs#reader@team:smallprojectteam#member
+
+  document:smallprojectdoc1#owner@user:smallprojectmember1
+  document:smallprojectdoc1#parent_folder@folder:smallprojectdocs
+
+  document:smallprojectdoc2#owner@user:smallprojectmember2
+  document:smallprojectdoc2#parent_folder@folder:smallprojectdocs
+
+  document:smallprojectdoc3#owner@user:smallprojectmember3
+  document:smallprojectdoc3#parent_folder@folder:smallprojectdocs
+
+  // big project
+  project:bigproject#administrator@user:CTO
+
+  // Search team
+  team:searchteam#member@user:searchteamlead1
+  team:searchteam#member@user:searchteammember2
+  team:searchteam#member@user:searchteammember3
+  team:searchteam#member@user:searchteammember4
+
+  // payment team
+  team:paymentteam#member@user:paymentteamlead1
+  team:paymentteam#member@user:paymentteammember2
+  team:paymentteam#member@user:paymentteammember3
+  team:paymentteam#member@user:paymentteammember4
+
+  //folders
+  folder:bigprojectroot#parent_project@project:bigproject
+  folder:bigprojectroot#parent_project@project:bigproject
+  folder:bigprojectroot#reader@team:searchteam#member
+  folder:bigprojectroot#reader@team:paymentteam#member
+
+  //search subfolder
+  folder:search#parent_project@project:bigproject
+  folder:search#owner@user:searchteamlead1
+  folder:search#reader@team:searchteam#member
+
+  //payment subfolder
+  folder:payment#parent_project@project:bigproject
+  folder:payment#owner@user:paymentteamlead1
+  folder:payment#reader@team:paymentteam#member
+
+  //docs
+  document:readme#owner@user:CTO
+  document:readme#parent_folder@folder:bigprojectroot
+
+  document:search1#owner@user:searchteamlead1
+  document:search1#parent_folder@folder:search
+
+  document:search2#owner@user:searchteammember4
+  document:search2#parent_folder@folder:search
+
+  document:pay1#owner@user:paymentteamlead1
+  document:pay1#parent_folder@folder:payment
+
+  document:pay2#owner@user:paymentteammember3
+  document:pay2#parent_folder@folder:payment
+assertions:
+  assertTrue:
+    - folder:smallprojectroot#read@user:lead1
+    - folder:smallprojectroot#read@user:smallprojectmember1
+    - folder:bigprojectroot#read@user:paymentteammember2
+    - folder:bigprojectroot#read@user:searchteammember2
+    - folder:payment#read@user:paymentteammember2
+    - document:pay2#view@user:paymentteammember2
+  assertFalse:
+    - folder:payment#read@user:smallprojectmember1
+    - folder:payment#read@user:searchteammember2
+    - document:pay2#view@user:searchteammember3
+validation:
+  document:smallprojectdoc1#admin:
+    - "[user:lead1] is <project:smallproject#administrator>"
+    - "[user:smallprojectmember1] is <document:smallprojectdoc1#owner>/<folder:smallprojectdocs#owner>"
+  document:smallprojectdoc2#admin:
+    - "[user:lead1] is <project:smallproject#administrator>"
+    - "[user:smallprojectmember1] is <folder:smallprojectdocs#owner>"
+    - "[user:smallprojectmember2] is <document:smallprojectdoc2#owner>"
+  document:smallprojectdoc3#admin:
+    - "[user:lead1] is <project:smallproject#administrator>"
+    - "[user:smallprojectmember1] is <folder:smallprojectdocs#owner>"
+    - "[user:smallprojectmember3] is <document:smallprojectdoc3#owner>"
+  folder:smallprojectdocs#admin:
+    - "[user:lead1] is <project:smallproject#administrator>"
+    - "[user:smallprojectmember1] is <folder:smallprojectdocs#owner>"
+  folder:smallprojectdocs#read:
+    - "[team:smallprojectteam#member] is <folder:smallprojectdocs#reader>"
+    - "[user:lead1] is <project:smallproject#administrator>"
+    - "[user:smallprojectmember1] is <team:smallprojectteam#member>"
+    - "[user:smallprojectmember2] is <team:smallprojectteam#member>"
+    - "[user:smallprojectmember3] is <team:smallprojectteam#member>"
+  folder:smallprojectroot#admin:
+    - "[user:lead1] is <project:smallproject#administrator>"
+  folder:smallprojectroot#read:
+    - "[team:smallprojectteam#member] is <folder:smallprojectroot#reader>"
+    - "[user:lead1] is <project:smallproject#administrator>"
+    - "[user:smallprojectmember1] is <team:smallprojectteam#member>"
+    - "[user:smallprojectmember2] is <team:smallprojectteam#member>"
+    - "[user:smallprojectmember3] is <team:smallprojectteam#member>"

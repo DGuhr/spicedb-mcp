@@ -1,0 +1,35 @@
+schema: |-
+  definition user {}
+
+  definition team {
+    relation member: user
+  }
+  definition project {
+    relation administrator: user
+    relation team : team
+    permission contribute = team + administrator
+    permission admin = administrator 
+  }
+
+  definition folder {
+      relation owner : user | team#member
+      relation parent_project: project
+      relation reader: user | team#member
+      permission read = reader + parent_project.any(admin)
+      permission admin = owner + parent_project.any(admin)
+  }
+
+  definition document {
+    relation owner : user
+    relation parent_folder: folder
+    
+    /** reader indicates that the user is a reader on the document */
+    relation reader: user | team#member
+
+    /** writer indicates that the user is a writer on the document */
+    relation writer: user | team#member
+
+    /** view indicates whether the user can view the document */
+    permission view = reader + writer + parent_folder.any(read)
+    permission admin = owner + parent_folder->admin
+  }
