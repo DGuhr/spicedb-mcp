@@ -19,6 +19,25 @@ builder.Services.AddSingleton(_ =>
     return client;
 });
 
+builder.Services.AddSingleton<SchemaService.SchemaServiceClient>(serviceProvider =>
+{
+    var callCredentials = CallCredentials.FromInterceptor((context, metadata) =>
+    {
+        var testtoken = "testkey";
+        metadata.Add("Authorization", $"Bearer {testtoken}");
+        return Task.CompletedTask;
+    });
+    
+    var grpcCredentials = new CompositeCredentials(ChannelCredentials.Insecure, callCredentials);
+    var channel = GrpcChannel.ForAddress("http://localhost:50051", new GrpcChannelOptions
+    {
+        Credentials = grpcCredentials,
+        UnsafeUseInsecureChannelCallCredentials = true
+    });
+    
+    return new SchemaService.SchemaServiceClient(channel);
+});
+
 // SpiceDB client using gRPC
 builder.Services.AddSingleton<PermissionsService.PermissionsServiceClient>(serviceProvider => 
 {

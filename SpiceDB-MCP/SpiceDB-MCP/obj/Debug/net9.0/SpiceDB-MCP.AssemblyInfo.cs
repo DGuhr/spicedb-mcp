@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SpiceDB-MCP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b2b785ac1cf2a5c252a9674b1b83d075a385fb4a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8ebf8320d75cf95d056d5cf943a09de06deaf432")]
 [assembly: System.Reflection.AssemblyProductAttribute("SpiceDB-MCP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SpiceDB-MCP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

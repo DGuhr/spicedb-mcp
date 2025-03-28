@@ -42,3 +42,5 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+/SpiceDB-MCP/obj/
+/SpiceDB-MCP/bin/

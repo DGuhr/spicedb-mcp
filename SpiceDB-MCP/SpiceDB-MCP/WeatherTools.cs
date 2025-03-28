@@ -85,7 +85,29 @@ public static class WeatherTools
                                                                 Forecast: {period.GetProperty("detailedForecast").GetString()}
                                                                 """));
     }
-    
+
+    [McpServerTool,
+     Description("Get the SpiceDB schema in use.")]
+    public static string GetSchema(
+        SchemaService.SchemaServiceClient spiceDbClient)
+    {
+        try
+        {
+            ReadSchemaRequest request = new ReadSchemaRequest();
+            var response = spiceDbClient.ReadSchema(request);
+            var schema = response.SchemaText;
+            return schema;
+        }
+        catch (RpcException ex)
+        {
+            return $"Error looking up Schema: {ex.Status.Detail}";
+        }
+        catch (Exception ex)
+        {
+            return $"Error looking up Schema: {ex.Message}";
+        }
+    }
+
     [McpServerTool, 
      Description("Look up subjects with permission on a resource in SpiceDB")]
     public static async Task<string> LookupSubjects(
