@@ -2,8 +2,8 @@ This is the starting point for a highly experimental Model Context Protocol Serv
 
 ## Run the Code
 - install .net 9
-- `cd SpiceDB_MCP` and there, use `dotnet run` to start the code once (currently it uses the weather example). then break.
-- nothing more, as spicedb is not integrated yet.
+- `cd SpiceDB_MCP` and there, use `dotnet run` to start the code once. then break.
+- start calude desktop as mcp client (for now). Ask e.g. "who has access to document pay1". It may confuse the right permissions currently (read vs view) - this can be optimized for sure - it's a start. Currently just implements LookupSubjects ("who has access to..."-questions) and GetSchema for the LLM to know the right permissions, as a starting point. Currently only tested with claude sonnet 3.7
 
 ## Starting up SpiceDB
 ### docker 
