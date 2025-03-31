@@ -5,7 +5,7 @@ It spins up an example spicedb environment using docker compose, and then uses t
 
 
 ## What it does
-Here you can see an example of the output using Claude Desktop (this was done while developing, might not resemble the latest eecution paths. then again, determinism is not guaranteed altogether with AI, so who cares ;-):
+Here you can see an example of the output using Claude Desktop (this was done while developing, might not resemble the latest execution paths. then again, determinism is not guaranteed altogether with AI, so who cares ;-):
 ### Table view:
 ![tableview.png](assets/tableview.png)
 ### Graph view:
