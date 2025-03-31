@@ -26,7 +26,7 @@ If the file does not exist, create it. Then post / add the following json - chan
             "args": [
                 "run",
                 "--project",
-                "/PATH/TO//SOLUTION",
+                "/PATH/TO/SOLUTION",
                 "--no-build"
             ],
             "env": {
@@ -46,7 +46,22 @@ docker compose --env-file .env up -d
 ```
 
 ### Startup
-- start claude desktop as mcp client (for now). Ask e.g. "who has access to document pay1". It may confuse the right permissions currently (read vs view) - this can be optimized for sure - it's a start. Currently just implements LookupSubjects ("who has access to..."-questions) and GetSchema for the LLM to know the right permissions, as a starting point. Currently only tested with claude sonnet 3.7
+Start [Claude desktop](https://claude.ai/download) (free version suffices, you'd need an account though) as MCP client 
+(or use another one, which is the nice part ;-)). 
+
+Ask e.g. the following questions: 
+* who has access to document pay1?
+* What documents does the CTO have access to?
+* Who has access to search2?
+* Has smallteammember1 read-access to smallprojectdoc3 and smallprojectdoc1?
+* I wanna know who in my company has what permission to access what and why. Please visualize it as graph and as table.
+
+Note that especially for the last question, the LLM often wants to use ReadRelationships and GetSchema only. 
+I tried to mitigate that behaviour, but it still uses it a lot. Any description improvements are welcome ;-) 
+Also note that sometimes it has problems creatinga react-based graph (when it uses react). Indeterminism hooray.
+You can surely create a better prompt, telling it what library to use etc. - I'll leave that totally up to you(r LLM).
+
+p.s. Keep in mind this is an experiment, so the model may not be fully great. Didn't put much thought into it. You can change it with your model/relations by changing the contents of the yaml files in the `bootstrap` directory.
 
 ### ZED CLI-usage
 If you wanna use zed, install zed locally - see [docs](https://authzed.com/docs/spicedb/getting-started/installing-zed).
