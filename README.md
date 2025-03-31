@@ -2,7 +2,7 @@
 This is a highly experimental Model Context Protocol Server to let your llm use [SpiceDB](https://github.com/authzed/spicedb) 
 to answer access- and before the fact audit-related questions (as defined by NIST in [this PDF](https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-162.pdf), Section 3.1.2.3).
 It spins up an example spicedb environment using docker compose, and then uses the MCP-C#-SDK and the SpiceDB-C#-SDK to call `LookupSubjects`, `LookupResources`, `ReadRelationships` and `CheckBulkPermissions` under the hood.
-
+I used Claude Desktop as MCP client, so you'll need a (free) account there, too, or use another client.
 
 ## What it does
 Here you can see an example of the output using Claude Desktop (this was done while developing, 
