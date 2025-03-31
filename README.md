@@ -83,3 +83,7 @@ or get everyone who has access to a document:
 
 or check which documents a user has access to:
 `zed permission lookup-resources document view user:CTO`
+
+### Change code and see changes take effect
+If you wanna build something out of this, make sure you run "dotnet run" in your console of choice after you made your changes, 
+and restart Claude Desktop so it takes the new Version into account. This workflow feels bumpy, and I hope it gets improved in the future. 
