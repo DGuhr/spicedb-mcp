@@ -58,8 +58,8 @@ Ask e.g. the following questions:
 
 Note that especially for the last question, the LLM often wants to use ReadRelationships and GetSchema only. 
 I tried to mitigate that behaviour, but it still uses it a lot. Any description improvements are welcome ;-) 
-Also note that sometimes it has problems creatinga react-based graph (when it uses react). Indeterminism hooray.
-You can surely create a better prompt, telling it what library to use etc. - I'll leave that totally up to you(r LLM).
+Also note that sometimes it has problems creating a react-based graph (when it uses react). Indeterminism hooray.
+You can surely create a better prompt, telling it what library to use etc. - I'll leave that as an exercise for the reader.
 
 p.s. Keep in mind this is an experiment, so the model may not be fully great. Didn't put much thought into it. You can change it with your model/relations by changing the contents of the yaml files in the `bootstrap` directory.
 
