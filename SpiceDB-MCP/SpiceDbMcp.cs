@@ -10,7 +10,7 @@ public static class SpiceDbMcp
 {
     [McpServerTool,
      Description(
-         "Get the SpiceDB schema in use. Useful to get an overview over existing definitions, relations and permissions and the overall structure")]
+         "Get the SpiceDB schema in use. When in doubt, use this first to get an overview over the existing model to make other calls.")]
     public static string GetSchema(
         SchemaService.SchemaServiceClient spiceDbClient)
     {
@@ -96,7 +96,7 @@ public static class SpiceDbMcp
 
     [McpServerTool,
      Description(
-         "Look up subjects with permission on a resource in SpiceDB. Answers questions like 'Who has permission on resource <x>?'")]
+         "Look up subjects with permission on a resource in SpiceDB. Answers questions like 'Who has permission on resource <x>?' e.g. 'What users can read document a?'")]
     public static async Task<string> LookupSubjects(
         PermissionsService.PermissionsServiceClient spiceDbClient,
         [Description("The resource type")] string resourceType,
@@ -152,7 +152,7 @@ public static class SpiceDbMcp
 
     [McpServerTool,
      Description(
-         "Read relationships in SpiceDB, similar to 'zed relationship read'. All parameters are optional except resourceType.")]
+         "Read relationships in SpiceDB. All parameters are optional except resourceType. Normally you use LookupSubjects or LookupResources before you want to use this.")]
     public static async Task<string> ReadRelationships(
         PermissionsService.PermissionsServiceClient spiceDbClient,
         [Description("The resource type (required)")]
@@ -215,9 +215,10 @@ public static class SpiceDbMcp
                 var relation = result.Relationship.Relation;
 
                 string subject;
-                subject = result.Relationship.Subject.Object != null ? 
-                    $"{result.Relationship.Subject.Object.ObjectType}" +
-                    $":{result.Relationship.Subject.Object.ObjectId}" : "N/A";
+                subject = result.Relationship.Subject.Object != null
+                    ? $"{result.Relationship.Subject.Object.ObjectType}" +
+                      $":{result.Relationship.Subject.Object.ObjectId}"
+                    : "N/A";
 
                 relationships.Add($"{resource} has {relation} relationship with {subject}");
             }
@@ -244,6 +245,120 @@ public static class SpiceDbMcp
         }
     }
 
+    //Note: JSON Array was not sent correctly by client which led to errors, so we switched to semicolon-separated. May investigate further.
+    [McpServerTool,
+     Description(
+         "Check multiple permissions at once in SpiceDB. Accepts a semicolon-separated list of permission checks in the format 'resourceType:resourceId:permission:subjectType:subjectId'.")]
+    public static async Task<string> CheckBulkPermissions(
+        PermissionsService.PermissionsServiceClient spiceDbClient,
+        [Description(
+            "Semicolon-separated list of permission checks in format 'resourceType:resourceId:permission:subjectType:subjectId'. Example: 'document:doc1:view:user:john;folder:folder1:read:user:jane'")]
+        string permissionChecks)
+    {
+        try
+        {
+            // Parse the semicolon-separated list of checks
+            var checks = permissionChecks.Split(';', StringSplitOptions.RemoveEmptyEntries)
+                .Select(check => check.Trim())
+                .Where(check => !string.IsNullOrEmpty(check))
+                .ToList();
+
+            if (checks.Count == 0)
+                return "Error: No valid permission checks provided";
+            
+            var request = new CheckBulkPermissionsRequest
+            {
+                Consistency = new Consistency { FullyConsistent = true }
+            };
+
+            var parsedChecks =
+                new List<(string ResourceType, string ResourceId, string Permission, string SubjectType, string
+                    SubjectId, string SubjectRelation)>();
+
+            foreach (var check in checks)
+            {
+                // Split by colon, supporting optional subject relation
+                var parts = check.Split(':', StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length < 5)
+                {
+                    return
+                        $"Error: Invalid check format: {check}. Expected format: 'resourceType:resourceId:permission:subjectType:subjectId[:subjectRelation]'";
+                }
+
+                var resourceType = parts[0].Trim();
+                var resourceId = parts[1].Trim();
+                var permission = parts[2].Trim();
+                var subjectType = parts[3].Trim();
+                var subjectId = parts[4].Trim();
+                var subjectRelation = parts.Length > 5 ? parts[5].Trim() : null;
+                
+                parsedChecks.Add((resourceType, resourceId, permission, subjectType, subjectId, subjectRelation ?? "none"));
+
+                var item = new CheckBulkPermissionsRequestItem
+                {
+                    Resource = new ObjectReference
+                    {
+                        ObjectType = resourceType,
+                        ObjectId = resourceId
+                    },
+                    Permission = permission,
+                    Subject = new SubjectReference
+                    {
+                        Object = new ObjectReference
+                        {
+                            ObjectType = subjectType,
+                            ObjectId = subjectId
+                        }
+                    }
+                };
+
+                // Add subject relation if provided
+                if (!string.IsNullOrEmpty(subjectRelation) && subjectRelation != "none")
+                {
+                    item.Subject.OptionalRelation = subjectRelation;
+                }
+
+                request.Items.Add(item);
+            }
+
+            var response = await spiceDbClient.CheckBulkPermissionsAsync(request);
+
+            var results = new List<string>();
+
+            for (var i = 0; i < response.Pairs.Count; i++)
+            {
+                var pair = response.Pairs[i];
+                var check = parsedChecks[i];
+
+                var resourceRef = $"{check.ResourceType}:{check.ResourceId}";
+                var subjectRef = $"{check.SubjectType}:{check.SubjectId}";
+                if (!string.IsNullOrEmpty(check.SubjectRelation))
+                    subjectRef += $"#{check.SubjectRelation}";
+
+                var hasPermission = pair.Item.Permissionship ==
+                                    CheckPermissionResponse.Types.Permissionship.HasPermission;
+
+                results.Add(
+                    $"{subjectRef} {(hasPermission ? "HAS" : "DOES NOT HAVE")} permission '{check.Permission}' on {resourceRef}");
+            }
+
+            return string.Join("\n", results);
+        }
+        catch (RpcException ex)
+        {
+            Console.WriteLine($"[ERROR] RPC Exception: {ex.Status.Detail}");
+            Console.WriteLine($"[ERROR] Status code: {ex.StatusCode}");
+            return $"Error checking bulk permissions: {ex.Status.Detail}";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERROR] Exception: {ex.Message}");
+            Console.WriteLine($"[ERROR] Stack trace: {ex.StackTrace}");
+            return $"Error checking bulk permissions: {ex.Message}";
+        }
+    }
+    
     // Helper method to build a human-readable description of the getrelations query
     private static string BuildQueryDescription(
         string resourceType,
@@ -262,16 +377,16 @@ public static class SpiceDbMcp
 
         if (!string.IsNullOrEmpty(relationshipName))
             description.Add($"relation '{relationshipName}'");
-        if (string.IsNullOrEmpty(subjectType))  
+        if (string.IsNullOrEmpty(subjectType))
             return string.Join(", ", description);
-        
+
         var subjectStr = $"subject '{subjectType}";
-        
+
         if (!string.IsNullOrEmpty(subjectId))
             subjectStr += $":{subjectId}";
         if (!string.IsNullOrEmpty(subjectRelation))
             subjectStr += $"#{subjectRelation}";
-        
+
         subjectStr += "'";
         description.Add(subjectStr);
 
