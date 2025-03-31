@@ -16,7 +16,7 @@ public static class SpiceDbMcp
     {
         try
         {
-            ReadSchemaRequest request = new ReadSchemaRequest();
+            var request = new ReadSchemaRequest();
             var response = spiceDbClient.ReadSchema(request);
             var schema = response.SchemaText;
             return schema;
@@ -155,7 +155,7 @@ public static class SpiceDbMcp
          "Read relationships in SpiceDB. All parameters are optional except resourceType. " +
          "IMPORTANT: Each time you wanna use this, you want to use LookupSubjects or LookupResources before " +
          "you want to use this, as it does not give you the computed permissions, only direct relations. " +
-         "This is used for questions like 'what users do I have?' or 'What documents are there?' ONLY." + 
+         "This is used for questions like 'what users do I have?' or 'What documents are there?' ONLY." +
          "Answer example: 'Relationships for <type>:id>:\n<type>:<id> has <relation> relationship with <type>:<id>, e.g. Relationships for project:bigproject:\nproject:bigproject has administrator relationship with user:CTO")]
     public static async Task<string> ReadRelationships(
         PermissionsService.PermissionsServiceClient spiceDbClient,
@@ -251,7 +251,7 @@ public static class SpiceDbMcp
     //Note: JSON Array was not sent correctly by client which led to errors, so we switched to semicolon-separated. May investigate further.
     [McpServerTool,
      Description(
-         "Check multiple permissions at once in SpiceDB. Accepts a semicolon-separated list of permission checks in the format 'resourceType:resourceId:permission:subjectType:subjectId'." + 
+         "Check multiple permissions at once in SpiceDB. Accepts a semicolon-separated list of permission checks in the format 'resourceType:resourceId:permission:subjectType:subjectId'." +
          "IMPORTANT: Favor this over multiple calls to LookupResources or LookupSubjects, as it only does one request with a bunch of checks.")]
     public static async Task<string> CheckBulkPermissions(
         PermissionsService.PermissionsServiceClient spiceDbClient,
@@ -260,6 +260,7 @@ public static class SpiceDbMcp
         string permissionChecks)
     {
         try
+
         {
             // Parse the semicolon-separated list of checks
             var checks = permissionChecks.Split(';', StringSplitOptions.RemoveEmptyEntries)
@@ -269,7 +270,7 @@ public static class SpiceDbMcp
 
             if (checks.Count == 0)
                 return "Error: No valid permission checks provided";
-            
+
             var request = new CheckBulkPermissionsRequest
             {
                 Consistency = new Consistency { FullyConsistent = true }
@@ -296,8 +297,9 @@ public static class SpiceDbMcp
                 var subjectType = parts[3].Trim();
                 var subjectId = parts[4].Trim();
                 var subjectRelation = parts.Length > 5 ? parts[5].Trim() : null;
-                
-                parsedChecks.Add((resourceType, resourceId, permission, subjectType, subjectId, subjectRelation ?? "none"));
+
+                parsedChecks.Add((resourceType, resourceId, permission, subjectType, subjectId,
+                    subjectRelation ?? "none"));
 
                 var item = new CheckBulkPermissionsRequestItem
                 {
@@ -358,7 +360,7 @@ public static class SpiceDbMcp
             return $"Error checking bulk permissions: {ex.Message}";
         }
     }
-    
+
     // Helper method to build a human-readable description of the getrelations query
     private static string BuildQueryDescription(
         string resourceType,

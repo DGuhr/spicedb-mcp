@@ -12,19 +12,20 @@ builder.Services.AddMcpServer()
     .WithStdioServerTransport()
     .WithToolsFromAssembly();
 
-builder.Services.AddSingleton(_ =>
+/*builder.Services.AddSingleton(_ =>
 {
     var client = new HttpClient() { BaseAddress = new Uri("https://api.weather.gov") };
     client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("weather-tool", "1.0"));
     return client;
-});
+});*/
 
-builder.Services.AddSingleton<SchemaService.SchemaServiceClient>(serviceProvider =>
+builder.Services.AddSingleton<SchemaService.SchemaServiceClient>(_ =>
 {
-    var callCredentials = CallCredentials.FromInterceptor((context, metadata) =>
+    var callCredentials = CallCredentials.FromInterceptor((_, metadata) =>
     {
-        var testtoken = "testkey";
-        metadata.Add("Authorization", $"Bearer {testtoken}");
+        var testToken = Environment.GetEnvironmentVariable("SPICEDB_PSK") 
+                        ?? throw new Exception("No SpiceDB token provided.");
+        metadata.Add("Authorization", $"Bearer {testToken}");
         return Task.CompletedTask;
     });
     
