@@ -152,7 +152,11 @@ public static class SpiceDbMcp
 
     [McpServerTool,
      Description(
-         "Read relationships in SpiceDB. All parameters are optional except resourceType. Normally you use LookupSubjects or LookupResources before you want to use this.")]
+         "Read relationships in SpiceDB. All parameters are optional except resourceType. " +
+         "IMPORTANT: Each time you wanna use this, you want to use LookupSubjects or LookupResources before " +
+         "you want to use this, as it does not give you the computed permissions, only direct relations. " +
+         "This is used for questions like 'what users do I have?' or 'What documents are there?' ONLY." + 
+         "Answer example: 'Relationships for <type>:id>:\n<type>:<id> has <relation> relationship with <type>:<id>, e.g. Relationships for project:bigproject:\nproject:bigproject has administrator relationship with user:CTO")]
     public static async Task<string> ReadRelationships(
         PermissionsService.PermissionsServiceClient spiceDbClient,
         [Description("The resource type (required)")]
@@ -214,8 +218,7 @@ public static class SpiceDbMcp
                 var resource = $"{result.Relationship.Resource.ObjectType}:{result.Relationship.Resource.ObjectId}";
                 var relation = result.Relationship.Relation;
 
-                string subject;
-                subject = result.Relationship.Subject.Object != null
+                var subject = result.Relationship.Subject.Object != null
                     ? $"{result.Relationship.Subject.Object.ObjectType}" +
                       $":{result.Relationship.Subject.Object.ObjectId}"
                     : "N/A";
@@ -248,7 +251,8 @@ public static class SpiceDbMcp
     //Note: JSON Array was not sent correctly by client which led to errors, so we switched to semicolon-separated. May investigate further.
     [McpServerTool,
      Description(
-         "Check multiple permissions at once in SpiceDB. Accepts a semicolon-separated list of permission checks in the format 'resourceType:resourceId:permission:subjectType:subjectId'.")]
+         "Check multiple permissions at once in SpiceDB. Accepts a semicolon-separated list of permission checks in the format 'resourceType:resourceId:permission:subjectType:subjectId'." + 
+         "IMPORTANT: Favor this over multiple calls to LookupResources or LookupSubjects, as it only does one request with a bunch of checks.")]
     public static async Task<string> CheckBulkPermissions(
         PermissionsService.PermissionsServiceClient spiceDbClient,
         [Description(
@@ -347,14 +351,10 @@ public static class SpiceDbMcp
         }
         catch (RpcException ex)
         {
-            Console.WriteLine($"[ERROR] RPC Exception: {ex.Status.Detail}");
-            Console.WriteLine($"[ERROR] Status code: {ex.StatusCode}");
             return $"Error checking bulk permissions: {ex.Status.Detail}";
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ERROR] Exception: {ex.Message}");
-            Console.WriteLine($"[ERROR] Stack trace: {ex.StackTrace}");
             return $"Error checking bulk permissions: {ex.Message}";
         }
     }
