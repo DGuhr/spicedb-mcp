@@ -37,7 +37,7 @@ If the file does not exist, create it. Then post / add the following json - chan
 }
 ```
 > [!CAUTION]
-> As of now this project uses the `MCP C#-SDK v0.1.0-preview.2` NuGet-Package. This package has a bug (or, maybe, the claude desktop client), so the spawned dotnet-processes DO NOT GET TERMINATED correctly. So after using, you want to run `ps aux | grep dotnet` or similar and kill the spawned dotnet processes.
+> As of now this project uses the `MCP C#-SDK v0.1.0-preview.2` NuGet-Package. This package has a bug (or, maybe, the claude desktop client - see this [Issue](https://github.com/modelcontextprotocol/csharp-sdk/issues/148) I created), so the spawned dotnet-processes DO NOT GET TERMINATED correctly. So after using, you want to run `ps aux | grep dotnet` or similar and kill the spawned dotnet processes.
 
 ### Starting up a local SpiceDB environment with Model and Schema
 The docker-compose.yaml loads the schema and test relations from the `bootstrap` folder, so all you need to do is
