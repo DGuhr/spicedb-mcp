@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol;
-using System.Net.Http.Headers;
 using Authzed.Api.V1;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -33,9 +32,9 @@ builder.Services.AddSingleton<SchemaService.SchemaServiceClient>(_ =>
 });
 
 // SpiceDB client using gRPC
-builder.Services.AddSingleton<PermissionsService.PermissionsServiceClient>(serviceProvider => 
+builder.Services.AddSingleton<PermissionsService.PermissionsServiceClient>(_ => 
 {
-    var callCredentials = CallCredentials.FromInterceptor((context, metadata) =>
+    var callCredentials = CallCredentials.FromInterceptor((_, metadata) =>
     {
         var testtoken = "testkey";
         metadata.Add("Authorization", $"Bearer {testtoken}");
@@ -57,19 +56,14 @@ var app = builder.Build();
 await app.RunAsync();
 
 
-internal class CompositeCredentials : ChannelCredentials
+internal class CompositeCredentials(ChannelCredentials channelCredentials, CallCredentials callCredentials)
+    : ChannelCredentials
 {
-    private readonly ChannelCredentials channelCredentials;
-    private readonly CallCredentials callCredentials;    
-
-    public CompositeCredentials(ChannelCredentials channelCredentials, CallCredentials callCredentials)
-    {
-        this.channelCredentials = channelCredentials ?? throw new ArgumentNullException(nameof(channelCredentials));
-        this.callCredentials = callCredentials ?? throw new ArgumentNullException(nameof(callCredentials));       
-    }
+    private readonly ChannelCredentials _channelCredentials = channelCredentials ?? throw new ArgumentNullException(nameof(channelCredentials));
+    private readonly CallCredentials _callCredentials = callCredentials ?? throw new ArgumentNullException(nameof(callCredentials));
 
     public override void InternalPopulateConfiguration(ChannelCredentialsConfiguratorBase configurator, object state)
     {
-        configurator.SetCompositeCredentials(state, channelCredentials, callCredentials);        
+        configurator.SetCompositeCredentials(state, _channelCredentials, _callCredentials);        
     }
 }
