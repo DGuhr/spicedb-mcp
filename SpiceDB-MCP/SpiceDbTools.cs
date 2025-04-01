@@ -6,7 +6,7 @@ using Grpc.Core;
 namespace SpiceDB_MCP;
 
 [McpServerToolType]
-public static class SpiceDbMcp
+public static class SpiceDbTools
 {
     [McpServerTool,
      Description(
@@ -119,7 +119,7 @@ public static class SpiceDbMcp
                 SubjectObjectType = subjectoOjectType,
                 Consistency = new Consistency
                 {
-                    FullyConsistent = true
+                    MinimizeLatency = true
                 }
             };
 
