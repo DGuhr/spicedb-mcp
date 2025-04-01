@@ -103,8 +103,8 @@ public static class SpiceDbTools
         [Description("The resource ID")] string resourceId,
         [Description("The permission to check")]
         string permission,
-        [Description("The subjectobejcttype to check")]
-        string subjectoOjectType)
+        [Description("The subjectobjecttype to check")]
+        string subjectoObjectType)
     {
         try
         {
@@ -116,7 +116,7 @@ public static class SpiceDbTools
                     ObjectId = resourceId
                 },
                 Permission = permission,
-                SubjectObjectType = subjectoOjectType,
+                SubjectObjectType = subjectoObjectType,
                 Consistency = new Consistency
                 {
                     MinimizeLatency = true
