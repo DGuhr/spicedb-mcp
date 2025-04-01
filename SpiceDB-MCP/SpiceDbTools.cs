@@ -104,7 +104,7 @@ public static class SpiceDbTools
         [Description("The permission to check")]
         string permission,
         [Description("The subjectobjecttype to check")]
-        string subjectoObjectType)
+        string subjectObjectType)
     {
         try
         {
