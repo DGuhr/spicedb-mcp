@@ -116,7 +116,7 @@ public static class SpiceDbTools
                     ObjectId = resourceId
                 },
                 Permission = permission,
-                SubjectObjectType = subjectoObjectType,
+                SubjectObjectType = subjectObjectType,
                 Consistency = new Consistency
                 {
                     MinimizeLatency = true
