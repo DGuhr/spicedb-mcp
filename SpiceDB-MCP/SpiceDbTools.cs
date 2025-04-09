@@ -149,7 +149,7 @@ public static class SpiceDbTools
             return $"Error looking up subjects: {ex.Message}";
         }
     }
-
+/*
     [McpServerTool,
      Description(
          "Read relationships in SpiceDB. All parameters are optional except resourceType. " +
@@ -247,7 +247,7 @@ public static class SpiceDbTools
             return $"Error reading relationships: {ex.Message}";
         }
     }
-
+*/
     //Note: JSON Array was not sent correctly by client which led to errors, so we switched to semicolon-separated. May investigate further.
     [McpServerTool,
      Description(
