@@ -4,6 +4,9 @@ to answer access- and before the fact audit-related questions (as defined by NIS
 It spins up an example spicedb environment using docker compose, and then uses the MCP-C#-SDK and the SpiceDB-C#-SDK to call `LookupSubjects`, `LookupResources`, `ReadRelationships` and `CheckBulkPermissions` under the hood.
 I used Claude Desktop as MCP client, so you'll need a (free) account there, too, or use another client.
 
+## Accompanying Blogpost
+You can find the accompanying Post [here]([url](https://www.innoq.com/en/articles/2025/04/journey-into-ai-mcp/)), walking you through the implementation, and adds some lessons learned. There are also some more broad [thoughts on MCP security]([url](https://www.innoq.com/en/articles/2025/04/journey-into-ai-mcp/#mythoughtsonmcpsecurity)) at the bottom you might find interesting. Feel free to reach out if you want to talk.
+
 ## What it does
 Here you can see an example of the output using Claude Desktop (this was done while developing, 
 might not resemble the latest execution paths. Then again, determinism is not guaranteed altogether with AI, so who cares ;-) ):
