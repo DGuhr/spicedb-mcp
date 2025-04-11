@@ -5,7 +5,7 @@ It spins up an example spicedb environment using docker compose, and then uses t
 I used Claude Desktop as MCP client, so you'll need a (free) account there, too, or use another client.
 
 ## Accompanying Blogpost
-You can find the accompanying Post [here]([url](https://www.innoq.com/en/articles/2025/04/journey-into-ai-mcp/)), walking you through the implementation, and adds some lessons learned. There are also some more broad [thoughts on MCP security]([url](https://www.innoq.com/en/articles/2025/04/journey-into-ai-mcp/#mythoughtsonmcpsecurity)) at the bottom you might find interesting. Feel free to reach out if you want to talk.
+You can find the accompanying Post [here](https://www.innoq.com/en/articles/2025/04/journey-into-ai-mcp/), walking you through the implementation, and adds some lessons learned. There are also some more broad [thoughts on MCP security](https://www.innoq.com/en/articles/2025/04/journey-into-ai-mcp/#mythoughtsonmcpsecurity) at the bottom you might find interesting. Feel free to reach out if you want to talk.
 
 ## What it does
 Here you can see an example of the output using Claude Desktop (this was done while developing, 
