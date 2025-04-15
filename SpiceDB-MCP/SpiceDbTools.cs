@@ -153,10 +153,12 @@ public static class SpiceDbTools
     [McpServerTool,
      Description(
          "Read relationships in SpiceDB. All parameters are optional except resourceType. " +
-         "IMPORTANT: Each time you wanna use this, you want to use LookupSubjects or LookupResources before " +
-         "you want to use this, as it does not give you the computed permissions, only direct relations. " +
-         "This is used for questions like 'what users do I have?' or 'What documents are there?' ONLY." +
-         "Answer example: 'Relationships for <type>:id>:\n<type>:<id> has <relation> relationship with <type>:<id>, e.g. Relationships for project:bigproject:\nproject:bigproject has administrator relationship with user:CTO")]
+         "<IMPORTANT> " +
+         "You must use LookupSubjects or LookupResources instead of ReadRelationships to compute access permissions." +
+         "Do NOT use this to compute access permissions, as it does not return the computed permissions. It returns only direct relations." +
+         "ReadRelationships should only be used for exploring questions like 'what users are there?' or 'What documents are there?'." +
+         "Answer example: 'Relationships for <type>:id>:\n<type>:<id> has <relation> relationship with <type>:<id>, e.g. Relationships for project:bigproject:\nproject:bigproject has administrator relationship with user:CTO" + 
+         "</IMPORTANT>")]
     public static async Task<string> ReadRelationships(
         PermissionsService.PermissionsServiceClient spiceDbClient,
         [Description("The resource type (required)")]
